@@ -8,7 +8,7 @@ const int MAX_TRY = 5;
 const int MAX_N = 20;
 
 int N;
-int MAP[MAX_N][MAX_N];
+// int MAP[MAX_N][MAX_N];
 
 int Answer = 0;
 
@@ -18,7 +18,7 @@ int Answer = 0;
 */
 
 
-void findMax() {
+void findMax(int MAP[MAX_N][MAX_N]) {
     for(int i = 0; i<N; i++) {
         for (int j=0; j<N; j++) {
             Answer = max(MAP[i][j], Answer);
@@ -26,7 +26,7 @@ void findMax() {
     }
 }
 
-void printBoard() {
+void printBoard(int MAP[MAX_N][MAX_N]) {
     for(int i = 0; i<N; i++) {
         for (int j=0; j<N; j++) {
             cout << MAP[i][j] << " " ;
@@ -35,7 +35,7 @@ void printBoard() {
     }
 }
 
-void copyArray(int target[MAX_N][MAX_N], int src[MAX_N][MAX_N]) {
+void copyArray(int (*target)[MAX_N], int src[MAX_N][MAX_N]) {
     for( int i =0; i<N; i++) {
         for(int j = 0; j<N; j++) {
             target[i][j] = src[i][j];
@@ -44,38 +44,38 @@ void copyArray(int target[MAX_N][MAX_N], int src[MAX_N][MAX_N]) {
 }
 
 
-void reverseLR() {
+void reverseLR(int (*MAP)[MAX_N]) {
     int C_MAP[MAX_N][MAX_N];
     for(int i=0; i<N; i++) {
         for(int j = 0; j<N; j++) {
             C_MAP[i][(N-1)-j] = MAP[i][j];
         }
     }
-    copyArray(MAP, C_MAP);
+    copyArray(MAP,C_MAP);
 }
 
 
-void rotateLeft() {
+void rotateLeft(int (*MAP)[MAX_N]) {
     int C_MAP[MAX_N][MAX_N];
     for(int i=0; i<N; i++) {
         for(int j = 0; j<N; j++) {
             C_MAP[(N-1)-i][j] = MAP[j][i];
         }
     }
-    copyArray(MAP, C_MAP);
+    copyArray(MAP,C_MAP);
 }
 
-void rotateRight() {
+void rotateRight(int (*MAP)[MAX_N]) {
     int C_MAP[MAX_N][MAX_N];
     for(int i=0; i<N; i++) {
         for(int j = 0; j<N; j++) {
             C_MAP[i][(N-1)-j] = MAP[j][i];
         }
     }
-    copyArray(MAP, C_MAP);
+    copyArray(MAP,C_MAP);
 }
 
-void sumLeftTORight() {
+void sumLeftTORight(int (*MAP)[MAX_N]) {
     int cur = 0;
     int sum = 0;
     for(int i = 0; i<N; i++) {
@@ -87,52 +87,55 @@ void sumLeftTORight() {
             else if(MAP[i][j] == MAP[i][cur]) {
                 MAP[i][cur] += MAP[i][j];
                 MAP[i][j] = 0;
+                cur += 1;
             } else if (cur < j && MAP[i][cur] == 0){
                 MAP[i][cur] = MAP[i][j];
                 MAP[i][j]= 0;
+            } else {
+                cur +=1;
             }
-            cur += 1;
+            
         }
         
     }
 }
 
-void Move(int dir, int cnt) {
+void Move(int dir, int cnt, int MAP[MAX_N][MAX_N]) {
     if(cnt > MAX_TRY) return;
 
     switch (dir)
     {
         case 0: //상
-            rotateLeft();
-            // sumLeftTORight();
-            // rotateRight();
+            rotateLeft(MAP);
+            // sumLeftTORight(MAP);
+            // rotateRight(MAP);
             break;
         case 1: //하
-            rotateRight();
-            // sumLeftTORight();
-            // rotateLeft();
+            rotateRight(MAP);
+            // sumLeftTORight(MAP);
+            // rotateLeft(MAP);
             break;
         case 2: //좌
-            // sumLeftTORight();
+            // sumLeftTORight(MAP);
             break;
         case 3: //우
-            reverseLR();
-            // sumLeftTORight();
-            // reverseLR();
+            reverseLR(MAP);
+            // sumLeftTORight(MAP);
+            // reverseLR(MAP);
             break;
     }
-    sumLeftTORight();
-    findMax();
+    sumLeftTORight(MAP);
+    findMax(MAP);
 
     for(int i=0; i<4; i++) {
-        Move(i,cnt+1);
+        Move(i,cnt+1,MAP);
     }
     
 }
 
 
 int main() {
-
+    int MAP[MAX_N][MAX_N];
     freopen("Input.txt", "r", stdin);
 
     cin >> N ;
@@ -142,13 +145,16 @@ int main() {
 			cin >> MAP[i][j];
 		}
 	}
+    if(N==1) {
+        cout << MAP[0][0];
+        return 0;
+    }
 
     for(int i=0; i<4; i++) {
-        Move(i,1);
+        Move(i,1,MAP);
     }
     
-
-    cout << Answer ;
+    cout << Answer;
 
 	return 0;
 }
