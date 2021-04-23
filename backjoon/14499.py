@@ -9,16 +9,8 @@ commands = list(map(int, input().split()))
 dy = [1, -1, 0, 0]
 dx = [0, 0, -1, 1]
 
-# init cube position
-x = 0
-y = 0
-
-cube = 0
-
-def getTop(bot):
-    if bot: 
-        return 6 - (bot-1)
-    else: return 0
+cube = [0]*6
+cur = 0
 
 def check_boundary(x,y):
     return 0<=x and x<N and 0<=y and y<M
@@ -29,29 +21,25 @@ def move(dir):
     global cube
 
     x += dx[dir-1]
-    y += dx[dir-1]
+    y += dy[dir-1]
 
+    if dir == 1: # 동
+        cube = [cube[2],cube[1],cube[5],cube[0],cube[4],cube[3]]
+    elif dir == 2: # 서
+        cube = [cube[3],cube[1],cube[0],cube[5],cube[4],cube[2]]
+    elif dir == 3: # 북
+        cube = [cube[4],cube[0],cube[2],cube[3],cube[5],cube[1]]
+    else : # 남
+        cube = [cube[5],cube[4],cube[2],cube[3],cube[1],cube[0]]
 
-def reverse(dir):
-    if dir==1:
-        return 2
-    elif dir == 2:
-        return 1
-    elif dir == 3:
-        return 4
-    else:
-        return 3
 
 for c in commands:
-    move(c)
-    if check_boundary(x,y):
+    if check_boundary(x+dx[c-1],y+dy[c-1]):
+        move(c)
         if board[x][y]: ## board의 숫자가 복사됨
-            print(getTop(cube))
-            cube = board[x][y]
-            print(getTop(board[x][y]))
+            cube[0] = board[x][y]
             board[x][y] = 0
+            print(cube[5])
         else: ## cube 하단면의 숫자가 복사됨
-            print(getTop(0))
-            board[x][y] = cube
-    else:
-        move(reverse(c))
+            board[x][y] = cube[0]
+            print(cube[5])
